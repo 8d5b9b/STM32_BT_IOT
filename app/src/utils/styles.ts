@@ -1,0 +1,1 @@
+export const CARD_BACKGROUND_COLOR = "#F5F5F5";
