@@ -1,0 +1,4 @@
+../Core/Src/project_sensor.c:73:6:Set_DeviceConnectable	1
+../Core/Src/project_sensor.c:123:6:user_notify	8
+../Core/Src/project_sensor.c:178:6:GAP_DisconnectionComplete_CB	1
+../Core/Src/project_sensor.c:193:6:GAP_ConnectionComplete_CB	2
