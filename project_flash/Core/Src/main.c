@@ -53,7 +53,7 @@ OSPI_HandleTypeDef hospi1;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-uint16_t single_block_data_size;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,7 +108,7 @@ int main(void)
 //  BSP_HSENSOR_Init(); // initialize humidity sensor
 //  BSP_TSENSOR_Init(); // initialize humidity sensor
 
-  single_block_data_size = MAX_DATA_SINGLE_BLOCK / sizeof(struct flash_data_type);
+
 
   if (BSP_QSPI_Init() != QSPI_OK) {
     Error_Handler();
@@ -118,7 +118,7 @@ int main(void)
   float temp_read;
   float humidity_read;
   float pressure_read;
-  int16_t noise_read = 123;
+  int32_t noise_read = 123;
 
   uint8_t count = 0;
 
@@ -138,16 +138,18 @@ int main(void)
 		  for (int i = 0; i < data_length_111; i++) {
 			  buffer[i] = readDataBlock1(i);
 		  }
+		  struct flash_data_type buffer_1[data_length_111];
+		  readDataArrayBlock1(0, buffer_1, data_length_111);
 		  break;
 	  }
 
 	  BSP_HSENSOR_Init();
-	  humidity_read = BSP_HSENSOR_ReadHumidity();
+	  humidity_read = (int16_t)BSP_HSENSOR_ReadHumidity();
 
 	  BSP_TSENSOR_Init();
-	  temp_read = BSP_TSENSOR_ReadTemp();
+	  temp_read = (int32_t) BSP_TSENSOR_ReadTemp();
 
-	  pressure_read = BSP_PSENSOR_ReadPressure();
+	  pressure_read = (int16_t) BSP_PSENSOR_ReadPressure();
 
 	  flash_data_write.humidity = humidity_read;
 	  flash_data_write.temperature = temp_read;
@@ -370,91 +372,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 
-
-/**
- * Read the number of struct data in the first data block
- * */
-
-uint16_t readNumOfData_1() {
-	uint16_t num = 0;
-	uint8_t data;
-	for (int i = 0; i < single_block_data_size; i++) {
-		// read a byte from the memory address
-		if (  BSP_QSPI_Read(&data, BASE_ADDR_BITMAP_1 + i, 1) != QSPI_OK) {
-		      	Error_Handler();
-		}
-
-		if (data == 0) { // if there is data in the location
-			num += 1;
-		} else {
-			break;
-		}
-	}
-	return num;
-}
-
-/**
- * Read the overall number of data
- * */
-uint16_t readDataLength() {
-	uint16_t num = 0;
-	uint16_t num_1 = readNumOfData_1();
-	num += num_1;
-	return num;
-}
-
-/**
- * Write a Struct data into the flash
- * In this implementation, if the block max is reached, all memory is deleted
- * If not, add 1 to the memory
- * */
-void writeDataToFlash(struct flash_data_type flash_data_input, uint16_t block_data_length, uint8_t block_index) {
-	// first check the current data length
-	uint16_t data_index = block_data_length;
-	uint8_t zero = 0;
-	uint32_t data_addr = 0;
-	uint32_t bitmap_addr = 0;
-	if (block_data_length == single_block_data_size) { // in case the block is full
-		// delete all data
-		  if (BSP_QSPI_Erase_Block(BASE_ADDR_BITMAP_1) != QSPI_OK) {
-		    Error_Handler();
-		  }
-
-		  if (BSP_QSPI_Erase_Block(BASE_ADDR_DATA_1) != QSPI_OK) {
-		      Error_Handler();
-		  }
-
-		  data_index = 0;
-	}
-
-	if (block_index == 0) {
-		data_addr = BASE_ADDR_DATA_1;
-		bitmap_addr = BASE_ADDR_BITMAP_1;
-	} else {
-		data_addr = BASE_ADDR_DATA_2;
-		bitmap_addr = BASE_ADDR_BITMAP_2;
-	}
-
-	// write to flash memory first
-    if ( BSP_QSPI_Write((uint8_t *) &flash_data_input, data_addr + (data_index * sizeof(struct flash_data_type)), sizeof(struct flash_data_type)) != QSPI_OK) {
-        	  Error_Handler();
-    }
-    // then write to bitmap
-    if ( BSP_QSPI_Write((uint8_t *) &zero, bitmap_addr + data_index, 1) != QSPI_OK) {
-    	      Error_Handler();
-    }
-
-}
-
-struct flash_data_type readDataBlock1(uint16_t index) {
-	struct flash_data_type flash_data_read;
-	uint32_t data_addr = BASE_ADDR_DATA_1;
-	if (  BSP_QSPI_Read((uint8_t *)&flash_data_read, data_addr + (index * sizeof(struct flash_data_type)), sizeof(struct flash_data_type)) != QSPI_OK) {
-	    Error_Handler();
-	}
-	return flash_data_read;
-
-}
 
 /* USER CODE END 4 */
 
