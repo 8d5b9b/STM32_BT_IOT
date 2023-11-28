@@ -4,19 +4,22 @@
 int single_block_data_size =  (MAX_DATA_SINGLE_BLOCK / sizeof(struct flash_data_type));
 
 /**
- * Read the number of struct data in the first data block
+ * Return the index of the first block that is available to read
+ * Which is equivalent to know how many data has been read
  * */
 
-uint16_t readNumOfData_1() {
+uint16_t readNumOfData_read_1() {
 	uint16_t num = 0;
 	uint8_t data;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
 	for (int i = 0; i < single_block_data_size; i++) {
 		// read a byte from the memory address
-		if (  BSP_QSPI_Read(&data, BASE_ADDR_BITMAP_1 + i, 1) != QSPI_OK) {
+
+		if (  BSP_QSPI_Read(&data, bitmap_addr, sizeof(data)) != QSPI_OK) {
 		      	Error_Handler();
 		}
-
-		if (data == 0) { // if there is data in the location
+		bitmap_addr += 1;
+		if (data == 0) {
 			num += 1;
 		} else {
 			break;
@@ -26,19 +29,94 @@ uint16_t readNumOfData_1() {
 }
 
 /**
- * Read Data, starting from an offset
+ * Read the number of struct data in the first data block that have not been read
+ * */
+
+uint16_t readNumOfData_1() {
+	uint16_t num = 0;
+	uint8_t data;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
+	for (int i = 0; i < single_block_data_size; i++) {
+		// read a byte from the memory address
+
+		if (  BSP_QSPI_Read(&data, bitmap_addr, sizeof(data)) != QSPI_OK) {
+		      	Error_Handler();
+		}
+		bitmap_addr += 1;
+		if (data == 0) {
+			continue;
+		} else if (data == 255) {
+			break;
+		} else {
+			num += 1;
+		}
+	}
+	return num;
+}
+
+/**
+ * Read Data that have not been read, starting from an offset
  * */
 
 uint16_t readNumOfData_1_offset(uint16_t offset_index) { // offset is the index of the data to count
 	uint16_t num = 0;
 	uint8_t data;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
 	for (int i = offset_index; i < single_block_data_size; i++) {
 		// read a byte from the memory address
-		if (  BSP_QSPI_Read(&data, BASE_ADDR_BITMAP_1 + i, 1) != QSPI_OK) {
+		if (  BSP_QSPI_Read(&data, bitmap_addr, sizeof(data)) != QSPI_OK) {
 		      	Error_Handler();
 		}
+		bitmap_addr += 1;
+		if (data == 0) {
+			continue;
+		} else if (data == 255) {
+			break;
+		} else {
+			num += 1;
+		}
+	}
+	return num;
+}
 
-		if (data == 0) { // if there is data in the location
+/**
+ * Read the number of struct data in the first data block that have not been write
+ * */
+
+uint16_t readNumOfData_1_write() {
+	uint16_t num = 0;
+	uint8_t data;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
+	for (int i = 0; i < single_block_data_size; i++) {
+		// read a byte from the memory address
+		if (  BSP_QSPI_Read(&data, bitmap_addr, sizeof(data)) != QSPI_OK) {
+		      	Error_Handler();
+		}
+		bitmap_addr += 1;
+		if (data != 255) { // if there is data in the location
+			num += 1;
+		} else {
+			break;
+		}
+	}
+	return num;
+}
+
+/**
+ * Read Data that have not been read, starting from an offset
+ * */
+
+uint16_t readNumOfData_1_write_offset(uint16_t offset_index) { // offset is the index of the data to count
+	uint16_t num = 0;
+	uint8_t data;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
+	for (int i = offset_index; i < single_block_data_size; i++) {
+		// read a byte from the memory address
+		if (  BSP_QSPI_Read(&data, bitmap_addr, sizeof(data)) != QSPI_OK) {
+		      	Error_Handler();
+		}
+		bitmap_addr += 1;
+		if (data != 255) { // if there is data in the location
 			num += 1;
 		} else {
 			break;
@@ -57,8 +135,8 @@ uint16_t readNumOfData_1_offset(uint16_t offset_index) { // offset is the index 
 void writeDataToFlash(struct flash_data_type flash_data_input, uint16_t block_data_length, uint8_t block_index) {
 	// first check the current data length
 	uint16_t data_index = block_data_length;
-	uint8_t zero = 0;
-//	uint8_t one = 15;
+//	uint8_t zero = 0;
+	uint8_t one = 15;
 	uint32_t data_addr = 0;
 	uint32_t bitmap_addr = 0;
 	if (block_data_length == single_block_data_size) { // in case the block is full
@@ -87,7 +165,7 @@ void writeDataToFlash(struct flash_data_type flash_data_input, uint16_t block_da
         	  Error_Handler();
     }
     // then write to bitmap
-    if ( BSP_QSPI_Write((uint8_t *) &zero, bitmap_addr + data_index, 1) != QSPI_OK) {
+    if ( BSP_QSPI_Write((uint8_t *) &one, bitmap_addr + data_index, 1) != QSPI_OK) {
     	      Error_Handler();
     }
 
@@ -98,11 +176,17 @@ void writeDataToFlash(struct flash_data_type flash_data_input, uint16_t block_da
  * */
 
 struct flash_data_type readDataBlock1(uint16_t index) {
+	uint8_t zero = 0;
 	struct flash_data_type flash_data_read;
 	uint32_t data_addr = BASE_ADDR_DATA_1;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
 	if (  BSP_QSPI_Read((uint8_t *)&flash_data_read, data_addr + (index * sizeof(struct flash_data_type)), sizeof(struct flash_data_type)) != QSPI_OK) {
 	    Error_Handler();
 	}
+
+    if ( BSP_QSPI_Write((uint8_t *) &zero, bitmap_addr + index, 1) != QSPI_OK) {
+    	      Error_Handler();
+    }
 	return flash_data_read;
 
 }
@@ -113,9 +197,18 @@ struct flash_data_type readDataBlock1(uint16_t index) {
 
 void readDataArrayBlock1(uint16_t index, struct flash_data_type* flash_data_ptr, uint16_t read_data_length) {
 	uint32_t data_addr = BASE_ADDR_DATA_1;
+	uint8_t zero = 0;
+	uint32_t bitmap_addr = BASE_ADDR_BITMAP_1;
 	if (  BSP_QSPI_Read((uint8_t *)flash_data_ptr, data_addr + (index * sizeof(struct flash_data_type)), read_data_length * sizeof(struct flash_data_type)) != QSPI_OK) {
 	    Error_Handler();
 	}
+	for (int i = 0; i < read_data_length; i++) {
+	    if ( BSP_QSPI_Write((uint8_t *) &zero, bitmap_addr + index, 1) != QSPI_OK) {
+	    	      Error_Handler();
+	    }
+	    bitmap_addr += 1;
+	}
+
 }
 
 /**

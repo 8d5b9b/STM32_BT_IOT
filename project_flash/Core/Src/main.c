@@ -133,13 +133,64 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  if (count == 3) {
-		  uint16_t data_length_111 = readNumOfData_1();
-		  struct flash_data_type buffer[data_length_111];
-		  for (int i = 0; i < data_length_111; i++) {
-			  buffer[i] = readDataBlock1(i);
+		  uint8_t bitmap_data_1;
+		  uint8_t bitmap_data_2;
+		  uint8_t bitmap_data_3;
+		  uint8_t bitmap_data_4;
+		  uint8_t bitmap_data_5;
+		  uint8_t bitmap_data_6;
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_1, 0x010000, 1) != QSPI_OK) {
+			    Error_Handler();
 		  }
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_2, 0x010001, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_3, 0x010002, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_4, 0x010003, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_5, 0x010004, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_6, 0x010005, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+
+		  uint16_t data_length_111 = readNumOfData_1();
+//		  struct flash_data_type buffer[data_length_111];
+//		  for (int i = 0; i < data_length_111; i++) {
+//			  buffer[i] = readDataBlock1(i);
+//		  }
+		  uint16_t start_index = readNumOfData_read_1();
 		  struct flash_data_type buffer_1[data_length_111];
-		  readDataArrayBlock1(0, buffer_1, data_length_111);
+		  readDataArrayBlock1(start_index, buffer_1, data_length_111);
+
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_1, 0x010000, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_2, 0x010001, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_3, 0x010002, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_4, 0x010003, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_5, 0x010004, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
+		  if (  BSP_QSPI_Read((uint8_t *)&bitmap_data_6, 0x010005, 1) != QSPI_OK) {
+			    Error_Handler();
+		  }
 		  break;
 	  }
 
@@ -157,7 +208,7 @@ int main(void)
 	  flash_data_write.noise = noise_read;
 	  flash_data_write.timestamp = count;
 
-	  uint16_t data_length = readNumOfData_1();
+	  uint16_t data_length = readNumOfData_1_write(); // this length is used for writing
 	  writeDataToFlash(flash_data_write, data_length, 0);
 
 	  count++;
