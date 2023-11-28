@@ -1,0 +1,6 @@
+../Core/Src/project_ble.c:59:6:init_ble	56	static
+../Core/Src/project_ble.c:151:6:User_Init	4	static
+../Core/Src/project_ble.c:157:12:Add_SensorData_Service	64	static
+../Core/Src/project_ble.c:188:12:Sensor_Reading_Update	48	static
+../Core/Src/project_ble.c:210:6:Read_Request_CB	32	static
+../Core/Src/project_ble.c:233:6:run_ble	40	static

@@ -10,6 +10,7 @@ import * as Bluetooth from "../../utils/ble";
 import AppTextInput from "../../components/AppTextInput";
 import { BLECharacteristic, BLEDevice } from "../../utils/ble/ble.types";
 import decodeMessage from "./utils/decodeMessage";
+// import Svg, { Circle, Rect } from 'react-native-svg';
 
 type Props = {};
 
@@ -54,6 +55,10 @@ const ConnectedDevice = (props: Props) => {
       <DevicePreview name={device.name} id={device.id} state={device.state} />
       <Text>Send Message To Device:</Text>
       <AppTextInput value={input} onChangeText={setInput} />
+      {/* <Svg height="50%" width="50%" viewBox="0 0 100 100" {...props}>
+      <Circle cx="50" cy="50" r="45" stroke="blue" strokeWidth="2.5" fill="green" />
+      <Rect x="15" y="15" width="70" height="70" stroke="red" strokeWidth="2" fill="yellow" />
+    </Svg> */}
       <AppButton
         title="Send"
         disabled={!characteristic}

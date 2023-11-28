@@ -24,7 +24,7 @@ const ScanDevices = (props: Props) => {
     setTimeout(() => {
       Bluetooth.cancelDeviceScan();
       setScanning(false);
-    }, 5000);
+    }, 25000);
   };
   const connect = (device: BLEDevice) => {
     Bluetooth.selectDevice(device);
