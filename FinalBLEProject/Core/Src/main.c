@@ -21,7 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "math.h"
 #include "project_ble.h"
+#include "project_flash.h"
 #include "stm32l475e_iot01_psensor.h"
 #include "stm32l475e_iot01_tsensor.h"
 #include "stm32l475e_iot01_hsensor.h"
@@ -59,9 +61,7 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 static int32_t wave_value[10000];
-static int32_t wave_value_filtered[10000];
 volatile static int32_t noise_level;
-uint16_t single_block_data_size;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,6 +80,54 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+float processMicDataAssembly(uint32_t *data) {
+	uint32_t result;
+
+	asm volatile (
+			".syntax unified\n"
+			"LDR     r2, [%[data]]\n"
+
+			"MOV     r3, #1\n"
+			"MOV     r6, #1\n"
+			"MOV     r4, r2\n"
+
+			"loop_start:\n"
+			"CMP     r3, #100\n"
+			"BGE     loop_add\n"
+
+			"ADD 	 %[data], %[data], #4\n"
+			"LDR     r5, [%[data]]\n"
+
+			"CMP     r5, r4\n"
+			"BLE     not_greater\n"
+
+			"MOV     r4, r5\n"
+
+			"not_greater:\n"
+			"STR     r5, [%[data]]\n"
+
+			"ADD     r3, r3, #1\n"
+			"B       loop_start\n"
+
+			"loop_add:\n"
+			"CMP     r6, #100\n"
+			"BGE     loop_end\n"
+			"ADD     r6, #1\n"
+			"MOV     r3, #1\n"
+			"B       loop_start\n"
+
+			"loop_end:\n"
+			"MOV     %[result], r4\n"
+			: [result] "=r" (result)
+			  : [data] "r" (data)
+				: "memory", "r2", "r3", "r4", "r5", "r6"
+	);
+
+	float ret = 16.283*log(result) - 185.93;
+//	int32_t final_result = (int32_t)(ret*10);
+	return ret;
+}
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == myButton_Pin) {
 		HAL_GPIO_TogglePin(myLED_GPIO_Port, myLED_Pin);
@@ -89,18 +137,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef * hdfsdm_filter){
 	//bitshift by 8
-	int32_t min = wave_value[0]>>8;
-	int32_t max = min;
-	for(int i = 0; i < 10000; i++){
-		wave_value_filtered[i] = wave_value[i]>>8;
-		if(wave_value_filtered[i] > max){
-			max = wave_value_filtered[i];
-		}
-		if(wave_value_filtered[i] < min){
-			min = wave_value_filtered[i];
-		}
-	}
-	noise_level = max-min;
+	noise_level = (int32_t)(processMicDataAssembly(wave_value));
+//	int32_t min = wave_value[0]>>8;
+//	int32_t max = min;
+//	for(int i = 0; i < 10000; i++){
+//		wave_value_filtered[i] = wave_value[i]>>8;
+//		if(wave_value_filtered[i] > max){
+//			max = wave_value_filtered[i];
+//		}
+//		if(wave_value_filtered[i] < min){
+//			min = wave_value_filtered[i];
+//		}
+//	}
+//	noise_level = max-min;
 	HAL_DFSDM_FilterRegularStop_DMA(&hdfsdm1_filter0);
 	HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0,wave_value,10000);
 }
@@ -109,10 +158,12 @@ BLE_Update_Data getReadings(){
 	curr_data.noise = noise_level;
 	curr_data.pressure = (int16_t) BSP_PSENSOR_ReadPressure();
 	curr_data.humidity =(int16_t) BSP_HSENSOR_ReadHumidity();
-	curr_data.temperature = (int16_t) BSP_TSENSOR_ReadTemp();
+	curr_data.temperature = (int16_t) (BSP_TSENSOR_ReadTemp()*10);
 	curr_data.timestamp = HAL_GetTick();
 	return curr_data;
 }
+
+
 
 /* USER CODE END 0 */
 
@@ -155,12 +206,12 @@ int main(void)
 	BSP_PSENSOR_Init();
 	BSP_TSENSOR_Init();
 	BSP_HSENSOR_Init();
-	if (BSP_QSPI_Init() != QSPI_OK) {
-		Error_Handler();
-	}
+	BSP_QSPI_Init();
 	init_ble();
+	clearFlashData1();
+	HAL_DFSDM_FilterRegularStop_DMA(&hdfsdm1_filter0);
+	HAL_DFSDM_FilterRegularStart_DMA(&hdfsdm1_filter0,wave_value,10000);
 	BLE_Update_Data curr_data;
-	single_block_data_size = MAX_DATA_SINGLE_BLOCK / sizeof(BLE_Update_Data);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -171,12 +222,8 @@ int main(void)
 
 		/* USER CODE BEGIN 3 */
 		curr_data= getReadings();
-		uint16_t data_length = readNumOfData_1();
-		if(data_length>0){
-			BLE_Update_Data stored_data = readDataBlock1(data_length-1);
-		}
-		writeDataToFlash(curr_data,data_length,0);
-		run_ble(curr_data,1);
+
+		run_ble(curr_data);
 		HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
@@ -727,90 +774,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 
-/**
- * Read the number of struct data in the first data block
- * */
-
-uint16_t readNumOfData_1() {
-	uint16_t num = 0;
-	uint8_t data;
-	for (int i = 0; i < single_block_data_size; i++) {
-		// read a byte from the memory address
-		if (  BSP_QSPI_Read(&data, BASE_ADDR_BITMAP_1 + i, 1) != QSPI_OK) {
-			Error_Handler();
-		}
-
-		if (data == 0) { // if there is data in the location
-			num += 1;
-		} else {
-			break;
-		}
-	}
-	return num;
-}
-
-/**
- * Read the overall number of data
- * */
-uint16_t readDataLength() {
-	uint16_t num = 0;
-	uint16_t num_1 = readNumOfData_1();
-	num += num_1;
-	return num;
-}
-
-/**
- * Write a Struct data into the flash
- * In this implementation, if the block max is reached, all memory is deleted
- * If not, add 1 to the memory
- * */
-void writeDataToFlash(BLE_Update_Data flash_data_input, uint16_t block_data_length, uint8_t block_index) {
-	// first check the current data length
-	uint16_t data_index = block_data_length;
-	uint8_t zero = 0;
-	uint32_t data_addr = 0;
-	uint32_t bitmap_addr = 0;
-	if (block_data_length == single_block_data_size) { // in case the block is full
-		// delete all data
-		if (BSP_QSPI_Erase_Block(BASE_ADDR_BITMAP_1) != QSPI_OK) {
-			Error_Handler();
-		}
-
-		if (BSP_QSPI_Erase_Block(BASE_ADDR_DATA_1) != QSPI_OK) {
-			Error_Handler();
-		}
-
-		data_index = 0;
-	}
-
-	if (block_index == 0) {
-		data_addr = BASE_ADDR_DATA_1;
-		bitmap_addr = BASE_ADDR_BITMAP_1;
-	} else {
-		data_addr = BASE_ADDR_DATA_2;
-		bitmap_addr = BASE_ADDR_BITMAP_2;
-	}
-
-	// write to flash memory first
-	if ( BSP_QSPI_Write((uint8_t *) &flash_data_input, data_addr + (data_index * sizeof(BLE_Update_Data)), sizeof(BLE_Update_Data)) != QSPI_OK) {
-		Error_Handler();
-	}
-	// then write to bitmap
-	if ( BSP_QSPI_Write((uint8_t *) &zero, bitmap_addr + data_index, 1) != QSPI_OK) {
-		Error_Handler();
-	}
-
-}
-
-BLE_Update_Data readDataBlock1(uint16_t index) {
-	BLE_Update_Data flash_data_read;
-	uint32_t data_addr = BASE_ADDR_DATA_1;
-	if (  BSP_QSPI_Read((uint8_t *)&flash_data_read, data_addr + (index * sizeof(BLE_Update_Data)), sizeof(BLE_Update_Data)) != QSPI_OK) {
-		Error_Handler();
-	}
-	return flash_data_read;
-
-}
 
 /* USER CODE END 4 */
 

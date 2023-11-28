@@ -1,7 +1,8 @@
-../Core/Src/project_ble.c:59:6:init_ble	7
-../Core/Src/project_ble.c:151:6:User_Init	1
-../Core/Src/project_ble.c:157:12:Add_SensorData_Service	3
-../Core/Src/project_ble.c:188:12:Sensor_Reading_Update	2
-../Core/Src/project_ble.c:210:6:Read_Request_CB	3
-../Core/Src/project_ble.c:231:5:getBLEConnected	1
-../Core/Src/project_ble.c:235:6:run_ble	4
+../Core/Src/project_ble.c:61:6:init_ble	7
+../Core/Src/project_ble.c:153:6:User_Init	1
+../Core/Src/project_ble.c:159:12:Add_SensorData_Service	3
+../Core/Src/project_ble.c:190:12:Sensor_Reading_Update	2
+../Core/Src/project_ble.c:211:12:Sensor_Reading_Update_Multiple	3
+../Core/Src/project_ble.c:238:6:Read_Request_CB	3
+../Core/Src/project_ble.c:259:5:getBLEConnected	1
+../Core/Src/project_ble.c:263:6:run_ble	7

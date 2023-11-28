@@ -14,7 +14,7 @@
 //#include "b_l475e_iot01a1.h"
 
 #define BDADDR_SIZE        6
-#define BLE_DATA_SIZE 14
+#define BLE_DATA_SIZE 16
 
 typedef union Service_UUID_t_s {
   /** 16-bit UUID
@@ -37,13 +37,13 @@ typedef union Char_UUID_t_s {
 
 typedef struct {
   uint32_t timestamp;
-  int16_t temperature;
+  int32_t temperature;
   int16_t pressure;
   int16_t humidity;
   int32_t noise;
 } BLE_Update_Data;
 
-void run_ble(BLE_Update_Data data, uint8_t send_update);
+void run_ble(BLE_Update_Data data);
 void init_ble();
 void Read_Request_CB(uint16_t handle);
 int getBLEConnected();

@@ -1,0 +1,6 @@
+../Core/Src/project_flash.c:12:10:readNumOfData_1	24	static
+../Core/Src/project_flash.c:34:10:readNumOfData_1_offset	32	static
+../Core/Src/project_flash.c:59:6:writeDataToFlash	48	static
+../Core/Src/project_flash.c:102:17:readDataBlock1	48	static
+../Core/Src/project_flash.c:116:6:readDataArrayBlock1	24	static
+../Core/Src/project_flash.c:126:6:clearFlashData1	8	static

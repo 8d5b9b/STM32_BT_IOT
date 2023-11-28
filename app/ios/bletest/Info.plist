@@ -46,6 +46,13 @@
         </dict>
       </dict>
     </dict>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>$(PRODUCT_NAME) uses Bluetooth to communicate with your device.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+      <string>remote-notification</string>
+      <string>fetch</string>
+    </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
@@ -72,12 +79,5 @@
     <string>Light</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-    <key>UIBackgroundModes</key>
-    <array>
-      <string>remote-notification</string>
-      <string>fetch</string>
-    </array>
-    <key>NSBluetoothAlwaysUsageDescription</key>
-    <string>$(PRODUCT_NAME) uses Bluetooth to communicate with your device.</string>
   </dict>
 </plist>

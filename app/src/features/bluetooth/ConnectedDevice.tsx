@@ -11,7 +11,7 @@ import AppTextInput from "../../components/AppTextInput";
 import { BLECharacteristic, BLEDevice } from "../../utils/ble/ble.types";
 import decodeMessage from "./utils/decodeMessage";
 import moment from "moment"
-import Svg, { Circle, Rect } from 'react-native-svg';
+// import Svg, { Circle, Rect } from 'react-native-svg';
 
 type Props = {};
 
@@ -19,9 +19,9 @@ const ConnectedDevice = (props: Props) => {
   const dispatch = useDispatch();
   const device = useSelector((state: MyAppState) => state.device);
   const messages = useSelector((state: MyAppState) => state.messages);
-  const [input, setInput] = React.useState("");
-  const [characteristic, setCharacteristic] =
-    React.useState<BLECharacteristic | null>(null);
+  // const [input, setInput] = React.useState("");
+  // const [characteristic, setCharacteristic] =
+  //   React.useState<BLECharacteristic | null>(null);
   const [monitoring, setMonitoring] = useState(false);
   const latestMessage= useMemo(() =>{
     if(messages.length===0) return null
@@ -29,25 +29,27 @@ const ConnectedDevice = (props: Props) => {
     const decoded= decodeMessage(messages[messages.length-1].message) 
     return decoded[decoded.length-1]
   }, [messages]); 
+  const individualMessages= useMemo(() =>{
+    return messages.flatMap(message=>decodeMessage(message.message))
+  }, [messages]);
+  // const graphData = useMemo(() => {
+  //   return messages.flatMap(message=>decodeMessage(message.message)).map(message=>{
+  //     return {
+  //       date: moment().add(message.timestamp, 'milliseconds').subtract(latestMessage?.timestamp,'milliseconds').toDate(),
+  //       value: message.noise
+  //     }
+  //    })
 
-  const graphData = useMemo(() => {
-    return messages.flatMap(message=>decodeMessage(message.message)).map(message=>{
-      return {
-        date: moment().add(message.timestamp, 'milliseconds').subtract(latestMessage?.timestamp,'milliseconds').toDate(),
-        value: message.noise
-      }
-     })
-
-  }, [messages, latestMessage]);
+  // }, [messages, latestMessage]);
   useEffect(() => {
     if (device && device.state === "connected" && !monitoring) {
       setMonitoring(true);
-      clearMessages();
-      Bluetooth.getWriteableCharacteristics(device).then((characteristics) => {
-        if (characteristics.length > 0) {
-          setCharacteristic(characteristics[0]);
-        }
-      });
+      // clearMessages();
+      // Bluetooth.getWriteableCharacteristics(device).then((characteristics) => {
+      //   if (characteristics.length > 0) {
+      //     setCharacteristic(characteristics[0]);
+      //   }
+      // });
     }
   }, [device]);
 
@@ -71,10 +73,10 @@ const ConnectedDevice = (props: Props) => {
       <DevicePreview name={device.name} id={device.id} state={device.state} />
       {/* <Text>Send Message To Device:</Text>
       <AppTextInput value={input} onChangeText={setInput} /> */}
-      <Svg height="50%" width="50%" viewBox="0 0 100 100">
+      {/* <Svg height="50%" width="50%" viewBox="0 0 100 100">
         <Circle cx="50" cy="50" r="45" stroke="blue" strokeWidth="2.5" fill="green" />
         <Rect x="15" y="15" width="70" height="70" stroke="red" strokeWidth="2" fill="yellow" />
-      </Svg>
+      </Svg> */}
       {/* <AppButton
         title="Send"
         disabled={!characteristic}
@@ -83,15 +85,16 @@ const ConnectedDevice = (props: Props) => {
           Bluetooth.sendMessageToCharacteristic(characteristic, input);
         }}
       /> */}
-      <View>
-        <Text>Pressure: {latestMessage?.pressure}</Text>
-        <Text>Temperature: {latestMessage?.temperature}</Text>
-        <Text>Humidity: {latestMessage?.humidity}</Text>
-        <Text>Noise: {latestMessage?.noise}</Text>
+      <View style={{paddingBottom:30,paddingTop:30}}>
+        <Text style={{textAlign:"center",fontSize:20}}>Pressure: {latestMessage?.pressure}</Text>
+        <Text style={{textAlign:"center",fontSize:20}}>Temperature: {latestMessage?.temperature}</Text>
+        <Text style={{textAlign:"center",fontSize:20}}>Humidity: {latestMessage?.humidity}</Text>
+        <Text style={{textAlign:"center",fontSize:20}}>Noise: {latestMessage?.noise}</Text>
+        <Text style={{textAlign:"center",fontSize:20}}>Num Readings: {individualMessages.length}</Text>
       </View>
       {/* {['pressure','temperature','humidity','noise'].map((item) => (<View><Text>{decodeMessage(messages[messages.length-1].message)[item]}</Text></View>))} */}
-      <Text>Messages Received From Device:</Text>
-      <AppButton title="Clear" onPress={clearMessages} />
+      {/* <Text>Messages Received From Device:</Text> */}
+      <AppButton title="Clear Readings" onPress={clearMessages} />
      {/* <LineGraph points={graphData} color="#4484B2" animated/> */}
     </ScrollView>
   );

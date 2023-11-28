@@ -22,7 +22,7 @@ export default function decodeMessage(message: string) {
   const num_readings = combineBytes(byteArray, 0, 2);
   const readings = [];
   for (let i = 0; i < num_readings; i++) {
-    const start = 2 + i * 16;
+    const start = 2; //+ i * 16;
     const reading = {
       timestamp: combineBytes(byteArray, start, 4),
       pressure: combineBytes(byteArray, start + 4, 2),

@@ -115,8 +115,10 @@ export const selectDevice = async (
       console.log("discovered cancelled");
       const deviceConn = await manager.connectToDevice(device.id);
       console.log("connected");
+      await deviceConn.requestMTU(242);
       await deviceConn.discoverAllServicesAndCharacteristics("discover");
       console.log("discovered");
+
       break;
     } catch (e) {
       console.log("failed");

@@ -38,6 +38,7 @@ Core/Src/project_ble.o: ../Core/Src/project_ble.c \
  ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_bus.h \
  ../Core/Inc/b_l475e_iot01a1_conf.h \
  ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_errno.h \
+ ../Core/Inc/project_flash.h ../Core/Inc/project_ble.h \
  ../Core/Inc/project_sensor.h ../Middlewares/ST/BlueNRG-MS/includes/hci.h \
  ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h \
  ../Middlewares/ST/BlueNRG-MS/includes/hci_le.h \
@@ -98,6 +99,8 @@ Core/Src/project_ble.o: ../Core/Src/project_ble.c \
 ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_bus.h:
 ../Core/Inc/b_l475e_iot01a1_conf.h:
 ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_errno.h:
+../Core/Inc/project_flash.h:
+../Core/Inc/project_ble.h:
 ../Core/Inc/project_sensor.h:
 ../Middlewares/ST/BlueNRG-MS/includes/hci.h:
 ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h:

@@ -1,4 +1,5 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
+Core/Src/project_flash.o: ../Core/Src/project_flash.c \
+ ../Core/Inc/project_flash.h ../Core/Inc/project_ble.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -37,21 +38,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_bus.h \
  ../Core/Inc/b_l475e_iot01a1_conf.h \
  ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_errno.h \
- ../Core/Inc/project_ble.h ../Core/Inc/project_ble.h \
- ../Core/Inc/project_flash.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_psensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/lps22hb.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/../Common/psensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/../Common/tsensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_tsensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/hts221.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/../Common/hsensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/../Common/tsensor.h \
- /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_hsensor.h \
  /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_qspi.h \
  /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/mx25r6435f/mx25r6435f.h
-../Core/Inc/main.h:
+../Core/Inc/project_flash.h:
+../Core/Inc/project_ble.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
@@ -90,18 +80,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_bus.h:
 ../Core/Inc/b_l475e_iot01a1_conf.h:
 ../Drivers/BSP/B-L475E-IOT01A1/b_l475e_iot01a1_errno.h:
-../Core/Inc/project_ble.h:
-../Core/Inc/project_ble.h:
-../Core/Inc/project_flash.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_psensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/lps22hb.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/../Common/psensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/lps22hb/../Common/tsensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_tsensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/hts221.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/../Common/hsensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/hts221/../Common/tsensor.h:
-/Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_hsensor.h:
 /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/stm32l475e_iot01_qspi.h:
 /Users/rreszetnik/Desktop/ECSE_444/STM32_ECSE444/FinalBLEProject/Drivers/B-L475E-IOT01/../Components/mx25r6435f/mx25r6435f.h:

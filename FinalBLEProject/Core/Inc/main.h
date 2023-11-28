@@ -32,7 +32,7 @@ extern "C" {
 #include "hci_tl_interface.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "project_ble.h";
+#include "project_ble.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -222,16 +222,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
-#define	BASE_ADDR_BITMAP_1	0x010000
-#define BASE_ADDR_DATA_1	0x020000
-
-#define	BASE_ADDR_BITMAP_2	0x030000
-#define BASE_ADDR_DATA_2	0x040000
-
-#define MAX_DATA_SINGLE_BLOCK	(64*1024)
-
-uint16_t readNumOfData_1();
-BLE_Update_Data readDataBlock1(uint16_t index);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
